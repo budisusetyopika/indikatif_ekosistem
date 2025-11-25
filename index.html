@@ -2,41 +2,58 @@
 <html lang="id">
 <head>
 <meta charset="utf-8" />
-<title>FGD Ekosistem – Peta Indikatif</title>
+<title>FGD Ekosistem – Peta Interaktif</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<!-- Leaflet Fullscreen CSS -->
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" />
+
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+<!-- Leaflet Fullscreen JS -->
+<script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
+
 <style>
-  body { margin: 0; }
-  #map { height: 100vh; width: 100%; }
+  body { margin: 0; font-family: Arial, sans-serif; }
+
+  #map {
+    height: 100vh;
+    width: 100%;
+  }
 
   /* Panel legenda */
   #legendPanel {
     position: absolute;
-    top: 20px;
-    right: 15px;
+    bottom: 20px;
+    right: 20px;
     background: white;
     padding: 10px;
     border-radius: 6px;
     box-shadow: 0 0 8px rgba(0,0,0,0.25);
     z-index: 9999;
   }
-  #legendPanel img { width: 220px; }
 
-  /* Panel transparansi */
-  #opacityControl {
+  #legendPanel img {
+    width: 260px;
+  }
+
+  /* Tombol Reset View */
+  .reset-button {
     position: absolute;
     top: 20px;
-    left: 15px;
-    background: white;
-    padding: 10px 14px;
-    border-radius: 6px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.25);
+    left: 20px;
     z-index: 9999;
-    width: 220px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
     font-size: 14px;
   }
 </style>
@@ -45,19 +62,10 @@
 
 <body>
 
-<div id="opacityControl">
-  <strong>Transparansi Layer:</strong><br>
+<!-- Tombol Reset View -->
+<div class="reset-button" onclick="resetView()">Reset View</div>
 
-  <label>Batas Admin</label><br>
-  <input id="op_batas" type="range" min="0" max="1" step="0.1" value="1"><br>
-
-  <label>Indikatif Ekosistem</label><br>
-  <input id="op_eko" type="range" min="0" max="1" step="0.1" value="1"><br>
-
-  <label>Elevasi</label><br>
-  <input id="op_elev" type="range" min="0" max="1" step="0.1" value="1"><br>
-</div>
-
+<!-- Panel legenda -->
 <div id="legendPanel">
   <img src="Layout2.jpg">
 </div>
@@ -65,33 +73,49 @@
 <div id="map"></div>
 
 <script>
-// ====== MAP AWAL ======
-var map = L.map('map').setView([-3.2, 129.4], 6);
+// =========================
+// MAP CRS SIMPLE
+// =========================
 
-// Basemap OSM
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19
-}).addTo(map);
+// Ukuran gambar (harus sesuai ukuran asli PNG)
+var imgWidth = 2245;
+var imgHeight = 3179;
 
+// Bounds gambar
+var bounds = [[0,0], [imgHeight, imgWidth]];
 
-// ====== KOORDINAT BOUNDING BOX ======
-// GANTI koordinat ini sesuai lokasi gambar Anda
-var bounds = [
-  [-12, 118],   // kiri bawah
-  [5, 142]      // kanan atas
-];
+// Peta utama
+var map = L.map('map', {
+  crs: L.CRS.Simple,
+  minZoom: -4,
+  maxZoom: 4,
+  fullscreenControl: true       // tombol fullscreen
+});
 
+// Fit ke tengah saat awal
+map.fitBounds(bounds);
 
-// ====== IMAGE OVERLAY ======
-var batasAdmin = L.imageOverlay('Layoutbatasadmin.png', bounds, {opacity:1});
-var indikatifEko = L.imageOverlay('Layoutindikatifekosistem.png', bounds, {opacity:1});
-var elevasiEko   = L.imageOverlay('Layoutelevasiekosistem.png', bounds, {opacity:1});
+// Function Reset View
+function resetView() {
+  map.fitBounds(bounds);
+}
 
-// Default tampilkan batas admin
+// =========================
+// LAYER PNG
+// =========================
+
+var batasAdmin = L.imageOverlay('Layoutbatasadmin.png', bounds);
+var indikatifEko = L.imageOverlay('Layoutindikatifekosistem.png', bounds);
+var elevasiEko = L.imageOverlay('Layoutelevasi.png', bounds);
+
+// Layer default sesuai urutan
 batasAdmin.addTo(map);
+indikatifEko.addTo(map);
+elevasiEko.addTo(map);
 
-
-// ====== LAYER CONTROL ======
+// =========================
+// LAYER CONTROL
+// =========================
 var overlays = {
   "Batas Administrasi": batasAdmin,
   "Indikatif Ekosistem": indikatifEko,
@@ -100,25 +124,11 @@ var overlays = {
 
 L.control.layers(null, overlays, {collapsed:false}).addTo(map);
 
-
-// ====== FIT BOUNDS ======
-map.fitBounds(bounds);
-
-
-// ====== SLIDER OPACITY ======
-document.getElementById('op_batas').addEventListener('input', e => {
-  batasAdmin.setOpacity(e.target.value);
-});
-document.getElementById('op_eko').addEventListener('input', e => {
-  indikatifEko.setOpacity(e.target.value);
-});
-document.getElementById('op_elev').addEventListener('input', e => {
-  elevasiEko.setOpacity(e.target.value);
-});
 </script>
 
 </body>
 </html>
+
 
 
 
