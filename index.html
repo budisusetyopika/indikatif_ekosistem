@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8" />
-<title>FGD Ekosistem – Peta Interaktif</title>
+<title>FGD Ekosistem – Peta Indikatif</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -68,5 +68,57 @@
 // ====== MAP AWAL ======
 var map = L.map('map').setView([-3.2, 129.4], 6);
 
-// Basem
+// Basemap OSM
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+
+
+// ====== KOORDINAT BOUNDING BOX ======
+// GANTI koordinat ini sesuai lokasi gambar Anda
+var bounds = [
+  [-12, 118],   // kiri bawah
+  [5, 142]      // kanan atas
+];
+
+
+// ====== IMAGE OVERLAY ======
+var batasAdmin = L.imageOverlay('Layoutbatasadmin.png', bounds, {opacity:1});
+var indikatifEko = L.imageOverlay('Layoutindikatifekosistem.png', bounds, {opacity:1});
+var elevasiEko   = L.imageOverlay('Layoutelevasiekosistem.png', bounds, {opacity:1});
+
+// Default tampilkan batas admin
+batasAdmin.addTo(map);
+
+
+// ====== LAYER CONTROL ======
+var overlays = {
+  "Batas Administrasi": batasAdmin,
+  "Indikatif Ekosistem": indikatifEko,
+  "Elevasi Ekosistem": elevasiEko
+};
+
+L.control.layers(null, overlays, {collapsed:false}).addTo(map);
+
+
+// ====== FIT BOUNDS ======
+map.fitBounds(bounds);
+
+
+// ====== SLIDER OPACITY ======
+document.getElementById('op_batas').addEventListener('input', e => {
+  batasAdmin.setOpacity(e.target.value);
+});
+document.getElementById('op_eko').addEventListener('input', e => {
+  indikatifEko.setOpacity(e.target.value);
+});
+document.getElementById('op_elev').addEventListener('input', e => {
+  elevasiEko.setOpacity(e.target.value);
+});
+</script>
+
+</body>
+</html>
+
+
 
