@@ -9,13 +9,13 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-<!-- Leaflet Fullscreen CSS -->
+<!-- Fullscreen CSS -->
 <link rel="stylesheet" href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" />
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- Leaflet Fullscreen JS -->
+<!-- Fullscreen JS -->
 <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
 
 <style>
@@ -24,6 +24,22 @@
   #map {
     height: 100vh;
     width: 100%;
+    background: #ddd;
+  }
+
+  /* Tombol reset view */
+  .reset-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    font-size: 14px;
   }
 
   /* Panel legenda */
@@ -41,31 +57,13 @@
   #legendPanel img {
     width: 260px;
   }
-
-  /* Tombol Reset View */
-  .reset-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 9999;
-    background: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(0,0,0,0.2);
-    font-size: 14px;
-  }
 </style>
-
 </head>
 
 <body>
 
-<!-- Tombol Reset View -->
 <div class="reset-button" onclick="resetView()">Reset View</div>
 
-<!-- Panel legenda -->
 <div id="legendPanel">
   <img src="Layout2.jpg">
 </div>
@@ -74,41 +72,37 @@
 
 <script>
 // =========================
-// MAP CRS SIMPLE
+// SETUP MAP (CRS Simple)
 // =========================
 
-// Ukuran gambar (harus sesuai ukuran asli PNG)
-var imgWidth = 2245;
-var imgHeight = 3179;
+// ukuran file PNG asli
+var imgWidth = 14043;
+var imgHeight = 9933;
 
-// Bounds gambar
+// bounds berdasarkan ukuran sebenarnya
 var bounds = [[0,0], [imgHeight, imgWidth]];
 
-// Peta utama
+// buat map
 var map = L.map('map', {
   crs: L.CRS.Simple,
-  minZoom: -4,
-  maxZoom: 4,
-  fullscreenControl: true       // tombol fullscreen
+  minZoom: -5,
+  maxZoom: 5,
+  fullscreenControl: true
 });
 
-// Fit ke tengah saat awal
-map.fitBounds(bounds);
-
-// Function Reset View
-function resetView() {
-  map.fitBounds(bounds);
-}
+// pusatkan tampilan
+function resetView() { map.fitBounds(bounds); }
+resetView();
 
 // =========================
-// LAYER PNG
+// TAMBAH LAYER IMAGE
 // =========================
 
 var batasAdmin = L.imageOverlay('Layoutbatasadmin.png', bounds);
-var indikatifEko = L.imageOverlay('Layoutindikatifekosistem.png', bounds);
+var indikatifEko = L.imageOverlay('Layoutindikatifkosistem.png', bounds);
 var elevasiEko = L.imageOverlay('Layoutelevasi.png', bounds);
 
-// Layer default sesuai urutan
+// urutan tampil (atas → bawah)
 batasAdmin.addTo(map);
 indikatifEko.addTo(map);
 elevasiEko.addTo(map);
@@ -116,13 +110,16 @@ elevasiEko.addTo(map);
 // =========================
 // LAYER CONTROL
 // =========================
-var overlays = {
-  "Batas Administrasi": batasAdmin,
-  "Indikatif Ekosistem": indikatifEko,
-  "Elevasi Ekosistem": elevasiEko
-};
 
-L.control.layers(null, overlays, {collapsed:false}).addTo(map);
+L.control.layers(
+  null,
+  {
+    "Batas Administrasi": batasAdmin,
+    "Indikatif Ekosistem": indikatifEko,
+    "Elevasi Ekosistem": elevasiEko
+  },
+  { collapsed: false }
+).addTo(map);
 
 </script>
 
