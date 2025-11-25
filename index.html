@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>Peta Ekosistem – Interaktif</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<!-- Fullscreen CSS -->
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Fullscreen JS -->
+<script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
+
+<style>
+  body { margin: 0; }
+
+  #map {
+    height: 100vh;
+    width: 100%;
+    background: #e3e3e3;
+  }
+
+  /* Tombol RESET VIEW */
+  .reset-button {
+    position: absolute;
+    top: 80px;       /* JARAK BARU (lebih jauh dari fullscreen) */
+    left: 15px;
+    z-index: 9999;
+    background: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.25);
+    font-size: 13px;
+  }
+
+  /* PANEL LEGENDA */
+  #legendPanel {
+    position: absolute;
+    bottom: 30px;   /* JARAK BARU (tidak kepentok browser bar) */
+    right: 30px;
+    background: white;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    z-index: 9999;
+  }
+
+  /* Ukuran legenda DIPERKECIL */
+  #legendPanel img {
+    width: 230px;  /* dari 280 → 230 */
+  }
+
+  /* CHECKLIST LAYER PETA */
+  .leaflet-control-layers {
+    margin-top: 140px !important; /* DIGESER KE BAWAH */
+    margin-left: 15px;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Tombol RESET VIEW -->
+<div class="reset-button" onclick="resetView()">Reset View</div>
+
+<!-- LEGENDA -->
+<div id="legendPanel">
+  <img src="Layout2.jpg">
+</div>
+
+<div id="map"></div>
+
+<script>
+// =========================
+// MAP SETTINGS
+// =========================
+var imgWidth = 14043;
+var imgHeight = 9933;
+
+var bounds = [[0,0], [imgHeight, imgWidth]];
+
+var map = L.map('map', {
+  crs: L.CRS.Simple,
+  minZoom: -6,
+  maxZoom: 4,
+  zoomSnap: 0.1,
+  zoomDelta: 0.3,
+  wheelPxPerZoomLevel: 120,
+  preferCanvas: true,
+  fullscreenControl: true,
+  zoomControl: false
+});
+
+// zoom tampil di kiri bawah
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+// reset
+function resetView() { map.fitBounds(bounds); }
+resetView();
+
+// =========================
+// LAYER IMAGE
+// =========================
+var petaEkosistem = L.imageOverlay('Layoutekosistem.png', bounds);
+var petaElevasi = L.imageOverlay('Layoutelevasi.png', bounds);
+
+// default hanya peta ekosistem ON
+petaEkosistem.addTo(map);
+
+// =========================
+// LAYER CONTROL (di kiri atas, tapi turun agar rapi)
+// =========================
+L.control.layers(
+  null,
+  {
+    "Peta Ekosistem": petaEkosistem,
+    "Peta Elevasi": petaElevasi
+  },
+  { collapsed: false, position: 'topleft' }
+).addTo(map);
+
+</script>
+
+</body>
+</html>
