@@ -6,19 +6,12 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
-  body { margin: 0; font-family: Arial, sans-serif; }
-
-  #map {
-    height: 100vh;
-    width: 100%;
-  }
+  body { margin: 0; }
+  #map { height: 100vh; width: 100%; }
 
   /* Panel legenda */
   #legendPanel {
@@ -31,12 +24,9 @@
     box-shadow: 0 0 8px rgba(0,0,0,0.25);
     z-index: 9999;
   }
+  #legendPanel img { width: 220px; }
 
-  #legendPanel img {
-    width: 220px;
-  }
-
-  /* Panel slider transparansi */
+  /* Panel transparansi */
   #opacityControl {
     position: absolute;
     top: 20px;
@@ -55,9 +45,9 @@
 
 <body>
 
-<!-- Slider kontrol transparansi -->
 <div id="opacityControl">
   <strong>Transparansi Layer:</strong><br>
+
   <label>Batas Admin</label><br>
   <input id="op_batas" type="range" min="0" max="1" step="0.1" value="1"><br>
 
@@ -68,7 +58,6 @@
   <input id="op_elev" type="range" min="0" max="1" step="0.1" value="1"><br>
 </div>
 
-<!-- Panel legenda -->
 <div id="legendPanel">
   <img src="Layout2.jpg">
 </div>
@@ -76,64 +65,8 @@
 <div id="map"></div>
 
 <script>
-// Lokasi peta (Maluku kira-kira)
-var map = L.map('map').setView([-3.2, 129.4], 7);
+// ====== MAP AWAL ======
+var map = L.map('map').setView([-3.2, 129.4], 6);
 
-// Basemap OSM
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '© OpenStreetMap'
-}).addTo(map);
+// Basem
 
-
-// ==========[ TAMBAH LAYER IMAGE ]==========
-
-// Semua gambar dianggap 2245 x 3179 px seperti file sebelumnya
-var imgWidth = 2245;
-var imgHeight = 3179;
-var bounds = [[0,0], [imgHeight, imgWidth]];
-
-// Membuat peta gambar (CRS Simple)
-var imgMap = L.map('map', { crs: L.CRS.Simple });
-
-// File yang Bapak sebutkan
-var batasAdmin = L.imageOverlay('Layoutbatasadmin.png', bounds, {opacity:1});
-var indikatifEko = L.imageOverlay('Layoutindikatifekosistem.png', bounds, {opacity:1});
-var elevasiEko   = L.imageOverlay('Layoutelevasiekosistem.png', bounds, {opacity:1});
-
-// Tambahkan salah satu layer sebagai default
-batasAdmin.addTo(map);
-
-
-// ON/OFF LAYER CONTROL
-var overlays = {
-  "Batas Administrasi": batasAdmin,
-  "Indikatif Ekosistem": indikatifEko,
-  "Elevasi Ekosistem": elevasiEko
-};
-
-L.control.layers(null, overlays, {collapsed:false}).addTo(map);
-
-
-// FIT BOUNDS AGAR PETA PAS
-map.fitBounds(bounds);
-
-
-// ==========[ SLIDER TRANSPARANSI ]==========
-
-document.getElementById('op_batas').addEventListener('input', function(e){
-  batasAdmin.setOpacity(e.target.value);
-});
-
-document.getElementById('op_eko').addEventListener('input', function(e){
-  indikatifEko.setOpacity(e.target.value);
-});
-
-document.getElementById('op_elev').addEventListener('input', function(e){
-  elevasiEko.setOpacity(e.target.value);
-});
-
-</script>
-
-</body>
-</html>
